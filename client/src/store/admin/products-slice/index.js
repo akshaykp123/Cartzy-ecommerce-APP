@@ -10,7 +10,7 @@ export const addNewProduct = createAsyncThunk(
   "/products/addnewproduct",
   async (formData) => {
     const result = await axios.post(
-      "http:///api/admin/products/add",
+      `${import.meta.env.VITE_API_URL}/api/admin/products/add`,
       formData,
       {
         headers: {
@@ -22,6 +22,7 @@ export const addNewProduct = createAsyncThunk(
     return result?.data;
   }
 );
+
 
 export const fetchAllProducts = createAsyncThunk(
   "/products/fetchAllProducts",
