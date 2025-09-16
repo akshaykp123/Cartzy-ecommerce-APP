@@ -27,7 +27,7 @@ export const fetchAllProducts = createAsyncThunk(
   "/products/fetchAllProducts",
   async () => {
     const result = await axios.get(
-      "${import.meta.env.VITE_API_URL}/api/admin/products/get"
+      `${import.meta.env.VITE_API_URL}/api/admin/products/get`
     );
 
     return result?.data;
