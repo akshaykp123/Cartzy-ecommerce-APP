@@ -4,8 +4,9 @@ import axios from "axios";
 const initialState = {
   approvalURL: null,
   isLoading: false,
+  isDetailsLoading: false,
   orderId: null,
-  orderList:[],
+  orderList: [],
   orderDetails: null,
 };
 
@@ -69,6 +70,10 @@ const shoppingOrderSlice = createSlice({
   name: "shoppingOrderSlice",
   initialState,
   reducers: {
+    // Action to immediately populate order details from in-memory orderList (0ms instant display)
+    setOrderDetails: (state, action) => {
+      state.orderDetails = action.payload;
+    },
     resetOrderDetails: (state) => {
       state.orderDetails = null;
     },
@@ -103,20 +108,21 @@ const shoppingOrderSlice = createSlice({
         state.isLoading = false;
         state.orderList = [];
       })
+      // NOTE: getOrderDetails uses isDetailsLoading, preventing background order list from flashing/unmounting into skeletons
       .addCase(getOrderDetails.pending, (state) => {
-        state.isLoading = true;
+        state.isDetailsLoading = true;
       })
       .addCase(getOrderDetails.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isDetailsLoading = false;
         state.orderDetails = action.payload.data;
       })
       .addCase(getOrderDetails.rejected, (state) => {
-        state.isLoading = false;
+        state.isDetailsLoading = false;
         state.orderDetails = null;
       });
   },
 });
 
-export const { resetOrderDetails } = shoppingOrderSlice.actions;
+export const { resetOrderDetails, setOrderDetails } = shoppingOrderSlice.actions;
 
 export default shoppingOrderSlice.reducer;

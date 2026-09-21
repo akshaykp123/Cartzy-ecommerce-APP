@@ -151,11 +151,11 @@ const getAllOrdersByUser = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // NOTE: Select only table summary fields and sort newest first.
-    // Omitting heavy nested cartItems and addressInfo objects dramatically reduces payload size and response latency.
+    // NOTE: Fetch all user orders with full details using .lean() for fast JSON serialization.
+    // Enables the client to open order details in 0ms without waiting for remote server round-trips.
     const orders = await Order.find({ userId })
-      .select("_id orderDate orderStatus totalAmount")
-      .sort({ orderDate: -1 });
+      .sort({ orderDate: -1 })
+      .lean();
 
     if (!orders.length) {
       return res.status(404).json({
@@ -181,7 +181,7 @@ const getOrderDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const order = await Order.findById(id);
+    const order = await Order.findById(id).lean();
 
     if (!order) {
       return res.status(404).json({

@@ -16,6 +16,7 @@ import {
   getAllOrdersByUserId,
   getOrderDetails,
   resetOrderDetails,
+  setOrderDetails,
 } from "@/store/shop/order-slice";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
@@ -26,13 +27,19 @@ function ShoppingOrders() {
 
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth) || {};
-  // NOTE: Destructure isLoading to show immediate visual skeleton placeholders during network fetch
-  const { orderList = [], orderDetails, isLoading } = useSelector(
+  // NOTE: isLoading is for the table; isDetailsLoading is dedicated to the details dialog
+  const { orderList = [], orderDetails, isLoading, isDetailsLoading } = useSelector(
     (state) => state.shopOrder || {}
   );
 
   function handleFetchOrderDetails(orderId) {
     setSelectedOrderId(orderId);
+    // NOTE: Instant 0ms popup — immediately show order data already cached in memory
+    const existingOrder = orderList?.find((order) => order._id === orderId);
+    if (existingOrder) {
+      dispatch(setOrderDetails(existingOrder));
+    }
+    // Also fetch fresh details in background
     dispatch(getOrderDetails(orderId));
     setOpenDetailsDialog(true);
   }
@@ -174,7 +181,11 @@ function ShoppingOrders() {
         }}
       >
         {selectedOrderId && (
-          <ShoppingOrderDetailsView orderDetails={orderDetails} />
+          <ShoppingOrderDetailsView
+            orderDetails={orderDetails}
+            selectedOrderId={selectedOrderId}
+            isDetailsLoading={isDetailsLoading}
+          />
         )}
       </Dialog>
     </Card>

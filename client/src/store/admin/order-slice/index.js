@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// Initial state: separate isLoading (for table list) and isDetailsLoading (for modal popup)
 const initialState = {
   isLoading: false,
+  isDetailsLoading: false,
   orderList: [],
   orderDetails: null,
 };
@@ -47,9 +49,11 @@ const adminOrderSlice = createSlice({
   name: "adminOrderSlice",
   initialState,
   reducers: {
+    // Action to immediately populate order details from in-memory orderList (0ms instant display)
+    setOrderDetails: (state, action) => {
+      state.orderDetails = action.payload;
+    },
     resetOrderDetails: (state) => {
-      console.log("resetOrderDetails");
-
       state.orderDetails = null;
     },
   },
@@ -66,20 +70,20 @@ const adminOrderSlice = createSlice({
         state.isLoading = false;
         state.orderList = [];
       })
+      // NOTE: getOrderDetailsForAdmin uses isDetailsLoading, preventing the background orders table from flashing/unmounting into skeletons
       .addCase(getOrderDetailsForAdmin.pending, (state) => {
-        state.isLoading = true;
+        state.isDetailsLoading = true;
       })
       .addCase(getOrderDetailsForAdmin.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isDetailsLoading = false;
         state.orderDetails = action.payload.data;
       })
       .addCase(getOrderDetailsForAdmin.rejected, (state) => {
-        state.isLoading = false;
-        state.orderDetails = null;
+        state.isDetailsLoading = false;
       });
   },
 });
 
-export const { resetOrderDetails } = adminOrderSlice.actions;
+export const { resetOrderDetails, setOrderDetails } = adminOrderSlice.actions;
 
 export default adminOrderSlice.reducer;

@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "../ui/dialog";
+import { Dialog } from "../ui/dialog";
 import {
   Table,
   TableBody,
@@ -22,18 +16,27 @@ import {
   getAllOrdersForAdmin,
   getOrderDetailsForAdmin,
   resetOrderDetails,
+  setOrderDetails,
 } from "@/store/admin/order-slice";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 
 function AdminOrdersView() {
   const [selectedOrderId, setSelectedOrderId] = useState(null); // track which order is selected
-  // NOTE: Destructure isLoading to show immediate visual skeleton placeholders during network fetch
-  const { orderList, orderDetails, isLoading } = useSelector((state) => state.adminOrder);
+  // NOTE: isLoading is for the table list; isDetailsLoading is dedicated to the details dialog
+  const { orderList, orderDetails, isLoading, isDetailsLoading } = useSelector(
+    (state) => state.adminOrder
+  );
   const dispatch = useDispatch();
 
   function handleFetchOrderDetails(getId) {
     setSelectedOrderId(getId);
+    // NOTE: Instant 0ms popup — immediately display existing order details already cached in memory
+    const existingOrder = orderList?.find((item) => item._id === getId);
+    if (existingOrder) {
+      dispatch(setOrderDetails(existingOrder));
+    }
+    // Also fetch latest details in the background to ensure sync without blocking the UI
     dispatch(getOrderDetailsForAdmin(getId));
   }
 
@@ -171,7 +174,7 @@ function AdminOrdersView() {
         </div>
       </CardContent>
 
-      {/* Single Dialog rendered outside loop */}
+      {/* Single Dialog: rendered without duplicate DialogContent wrapper so Radix UI opens smoothly with zero conflicts */}
       <Dialog
         open={!!selectedOrderId}
         onOpenChange={(isOpen) => {
@@ -181,15 +184,13 @@ function AdminOrdersView() {
           }
         }}
       >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Order #{selectedOrderId}</DialogTitle>
-            <DialogDescription>
-              Order details including items and quantities.
-            </DialogDescription>
-          </DialogHeader>
-          <AdminOrderDetailsView orderDetails={orderDetails} />
-        </DialogContent>
+        {selectedOrderId && (
+          <AdminOrderDetailsView
+            orderDetails={orderDetails}
+            selectedOrderId={selectedOrderId}
+            isDetailsLoading={isDetailsLoading}
+          />
+        )}
       </Dialog>
     </Card>
   );
