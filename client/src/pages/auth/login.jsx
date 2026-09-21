@@ -42,7 +42,7 @@ function AuthLogin() {
       </div>
 
       {/* NOTE: Elevated modern card container with subtle border, soft shadow, and clean spacing */}
-      <div className="rounded-3xl border border-border/80 bg-card p-8 sm:p-10 shadow-xl shadow-slate-200/50 dark:shadow-none space-y-6">
+      <div className="rounded-3xl border border-border/80 bg-card p-7 sm:p-8 shadow-xl shadow-slate-200/50 dark:shadow-none space-y-5">
         
         {/* Card Header */}
         <div className="text-center space-y-2">

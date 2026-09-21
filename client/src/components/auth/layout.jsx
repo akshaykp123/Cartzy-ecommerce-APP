@@ -54,10 +54,12 @@ function AuthLayout() {
   const CurrentIcon = slides[index].icon;
 
   return (
-    <div className="flex min-h-screen w-full">
-      {/* NOTE: Left-side hero showcase panel with high-res background photography, 
-          cinematic gradient overlay, and glassmorphism feature cards */}
-      <div className="relative hidden lg:flex flex-col justify-between w-1/2 min-h-screen p-12 overflow-hidden bg-zinc-950">
+    // NOTE: min-h-screen lg:h-screen and overflow-hidden ensure the login layout
+    // fits 100% edge-to-edge with the browser window without any unwanted vertical scrollbar on desktop.
+    <div className="flex min-h-screen lg:h-screen w-full overflow-hidden">
+      
+      {/* NOTE: Left-side hero showcase panel with high-res photography aligned to window edge */}
+      <div className="relative hidden lg:flex flex-col justify-between w-1/2 h-full p-8 xl:p-12 overflow-hidden bg-zinc-950">
         
         {/* Background Image with smooth crossfade transitions */}
         <div className="absolute inset-0 z-0 overflow-hidden">
@@ -66,17 +68,19 @@ function AuthLayout() {
               key={index}
               src={slides[index].image}
               alt="Cartzy Lifestyle"
-              initial={{ opacity: 0, scale: 1.06 }}
-              animate={{ opacity: 0.42, scale: 1 }}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 0.6, scale: 1 }}
               exit={{ opacity: 0, scale: 1.02 }}
               transition={{ duration: 0.85, ease: "easeInOut" }}
-              className="h-full w-full object-cover object-center"
+              // NOTE: object-[78%_center] aligns directly with the models on the right side of the banner,
+              // ensuring the photograph is properly positioned and visible within the panel.
+              className="h-full w-full object-cover object-[78%_center]"
             />
           </AnimatePresence>
 
           {/* Cinematic dark gradients for contrast and readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/40" />
-          <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/80 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-zinc-950/25" />
+          <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/80 via-zinc-950/40 to-transparent" />
 
           {/* Subtle warm ambient lighting glow */}
           <div className="absolute top-1/4 left-1/4 h-80 w-80 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" />
@@ -106,30 +110,30 @@ function AuthLayout() {
           <AnimatePresence mode="wait">
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -18 }}
-              transition={{ duration: 0.5 }}
-              className="rounded-3xl border border-white/15 bg-white/10 p-8 shadow-2xl backdrop-blur-xl"
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.45 }}
+              className="rounded-3xl border border-white/15 bg-white/10 p-7 xl:p-8 shadow-2xl backdrop-blur-xl"
             >
               {/* Feature Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full bg-amber-400/20 px-3.5 py-1 text-xs font-semibold text-amber-300 border border-amber-400/30 mb-5">
+              <div className="inline-flex items-center gap-2 rounded-full bg-amber-400/20 px-3.5 py-1 text-xs font-semibold text-amber-300 border border-amber-400/30 mb-4">
                 <CurrentIcon className="h-3.5 w-3.5 text-amber-400" />
                 <span>{slides[index].badge}</span>
               </div>
 
               {/* Slide Title */}
-              <h2 className="text-3xl font-extrabold leading-snug tracking-tight text-white mb-3">
+              <h2 className="text-2xl xl:text-3xl font-extrabold leading-snug tracking-tight text-white mb-2.5">
                 {slides[index].title}
               </h2>
 
               {/* Slide Description */}
-              <p className="text-sm leading-relaxed text-zinc-300 mb-6">
+              <p className="text-sm leading-relaxed text-zinc-300 mb-5">
                 {slides[index].description}
               </p>
 
               {/* Social Proof / Star Reviews */}
-              <div className="flex items-center gap-3 pt-4 border-t border-white/10">
+              <div className="flex items-center gap-3 pt-3.5 border-t border-white/10">
                 <div className="flex text-amber-400">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
@@ -143,7 +147,7 @@ function AuthLayout() {
           </AnimatePresence>
 
           {/* Progress Indicator Dots */}
-          <div className="flex items-center gap-2 mt-6">
+          <div className="flex items-center gap-2 mt-5">
             {slides.map((_, i) => (
               <button
                 key={i}
@@ -158,7 +162,7 @@ function AuthLayout() {
         </div>
 
         {/* Bottom Trust & Authenticity Stats */}
-        <div className="relative z-10 grid grid-cols-3 gap-4 pt-6 border-t border-white/10 text-white">
+        <div className="relative z-10 grid grid-cols-3 gap-4 pt-5 border-t border-white/10 text-white">
           <div>
             <p className="text-lg font-bold text-amber-400">100%</p>
             <p className="text-xs text-zinc-400">Authentic Brands</p>
@@ -174,9 +178,9 @@ function AuthLayout() {
         </div>
       </div>
 
-      {/* NOTE: Right-side form panel with elegant backdrop, padding, and centered container */}
-      <div className="flex flex-1 flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 p-6 sm:p-10 lg:p-12">
-        <div className="w-full max-w-md">
+      {/* NOTE: Right-side form panel flush with screen height, scrollable only if needed on small displays */}
+      <div className="flex flex-1 flex-col items-center justify-center min-h-screen lg:h-full bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 p-6 sm:p-8 lg:p-10 overflow-y-auto">
+        <div className="w-full max-w-md my-auto">
           <Outlet />
         </div>
       </div>
