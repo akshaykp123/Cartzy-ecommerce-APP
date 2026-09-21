@@ -18,12 +18,15 @@ function ShoppingAccount() {
       {/* Tabs */}
       <div className="container mx-auto grid grid-cols-1 gap-8 py-8">
         <div className="flex flex-col rounded-lg border bg-background p-6 shadow-sm">
-          <Tabs defaultValue="orders">
-            <TabsList>
-              <TabsTrigger value="orders">Orders</TabsTrigger>
-              <TabsTrigger value="address">Address</TabsTrigger>
-              <TabsTrigger value="contact">Contact</TabsTrigger>
-            </TabsList>
+          <Tabs defaultValue="orders" className="w-full">
+            {/* Center aligned tabs navigation header: centers the Orders, Address, and Contact tabs horizontally */}
+            <div className="flex justify-center mb-6">
+              <TabsList className="grid grid-cols-3 w-full max-w-md h-11">
+                <TabsTrigger value="orders" className="text-sm font-medium">Orders</TabsTrigger>
+                <TabsTrigger value="address" className="text-sm font-medium">Address</TabsTrigger>
+                <TabsTrigger value="contact" className="text-sm font-medium">Contact</TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="orders">
               <ShoppingOrders />
