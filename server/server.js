@@ -45,7 +45,15 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(express.json())
+app.use(express.json());
+
+// NOTE: Lightweight health check endpoint.
+// Can be pinged by an external uptime service (e.g. UptimeRobot, cron-job.org)
+// every 10-14 minutes to prevent Render free-tier instances from spinning down / sleeping.
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", message: "Server is active" });
+});
+
 app.use('/api/auth', authRouter)
 app.use("/api/admin/products",adminProductsRouter)
 app.use("/api/admin/orders",adminOrderRouter)

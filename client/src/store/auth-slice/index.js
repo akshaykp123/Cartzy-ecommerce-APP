@@ -2,12 +2,25 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 
-const initialState = {
-    isAuthenticated : false,
-    isLoading : true,
-    user : null,
-    token : null,
+// NOTE: Retrieve any stored token from sessionStorage on startup.
+// By checking for the token first, we only set isLoading to true if there is an
+// active session token to verify. If there is no token (e.g. first visit or logged-out state),
+// isLoading starts as false so the login page can load immediately without waiting on a backend call.
+let storedToken = null;
+try {
+  const rawToken = sessionStorage.getItem("token");
+  storedToken = rawToken ? JSON.parse(rawToken) : null;
+} catch (error) {
+  console.error("Error reading token from sessionStorage:", error);
+  storedToken = null;
 }
+
+const initialState = {
+  isAuthenticated: false,
+  isLoading: !!storedToken, // Only true if a token actually exists to verify
+  user: null,
+  token: storedToken,
+};
 
 export const registerUser = createAsyncThunk(
   "/auth/register",
@@ -105,9 +118,11 @@ const authSlice = createSlice({
     reducers: {
         setUser : (state,action) => {},
         resetTokenAndCredentials : (state) => {
-          state.isAuthenticated =false;
-          state.user = null
-          state.token = null
+          state.isAuthenticated = false;
+          state.user = null;
+          state.token = null;
+          // NOTE: Ensure loading is disabled when credentials are reset (e.g. on logout)
+          state.isLoading = false;
         }
     },
     extraReducers: (builder) => {

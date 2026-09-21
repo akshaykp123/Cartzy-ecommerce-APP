@@ -30,10 +30,16 @@ function App() {
   const {user, isAuthenticated, isLoading } = useSelector((state)=>state.auth);
   const dispatch = useDispatch();
 
-  useEffect(() =>{
-    const token = JSON.parse(sessionStorage.getItem('token'))
-      dispatch(checkAuth(token))
-  },[dispatch])
+  useEffect(() => {
+    // NOTE: Check if a token exists in sessionStorage.
+    // If no token exists, the user is unauthenticated by default.
+    // Skipping checkAuth avoids an unnecessary network request on initial link load,
+    // which prevents freezing on the Skeleton while waiting for Render backend cold starts.
+    const token = JSON.parse(sessionStorage.getItem('token'));
+    if (token) {
+      dispatch(checkAuth(token));
+    }
+  }, [dispatch]);
 
   if (isLoading) return <Skeleton className="w-[800] bg-black h-[600px]"  />
     
