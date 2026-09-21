@@ -149,6 +149,8 @@ const capturePayment = async (req, res) => {
 
 const getAllOrdersByUser = async (req, res) => {
   try {
+    const { userId } = req.params;
+
     // NOTE: Select only table summary fields and sort newest first.
     // Omitting heavy nested cartItems and addressInfo objects dramatically reduces payload size and response latency.
     const orders = await Order.find({ userId })
