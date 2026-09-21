@@ -1,7 +1,12 @@
 const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema({
-  userId: String,
+  // NOTE: Index on userId enables rapid indexed lookups (IXSCAN)
+  // preventing slow collection scans (COLLSCAN) when customers view their order history
+  userId: {
+    type: String,
+    index: true,
+  },
   cartId : String,
   
   cartItems: [
