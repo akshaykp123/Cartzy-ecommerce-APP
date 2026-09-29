@@ -2,6 +2,7 @@ const paypal = require("../../helpers/paypal");
 const Order = require("../../models/Order");
 const Cart = require("../../models/Cart");
 const Product = require("../../models/Product");
+const { sendNotification } = require("../../helpers/notification");
 
 const createOrder = async (req, res) => {
   try {
@@ -132,6 +133,18 @@ const capturePayment = async (req, res) => {
     await Cart.findByIdAndDelete(getCartId);
 
     await order.save();
+
+    // Notify admins via WebSocket (admin-room) & persist in MongoDB
+    const io = req.app.get("io");
+    const orderShortId = order._id.toString().slice(-6).toUpperCase();
+    await sendNotification(io, {
+      recipientRole: "admin",
+      title: "New Order Received!",
+      message: `Order #${orderShortId} placed by customer for $${order.totalAmount}`,
+      orderId: order._id,
+      eventName: "newOrderPlaced",
+      data: { order },
+    });
 
     res.status(200).json({
       success: true,

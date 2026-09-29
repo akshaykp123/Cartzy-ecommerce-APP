@@ -1,4 +1,5 @@
 const Order = require("../../models/Order");
+const { sendNotification } = require("../../helpers/notification");
 
 const getAllOrdersOfAllUsers = async (req, res) => {
   try {
@@ -69,6 +70,23 @@ const updateOrderStatus = async (req, res) => {
     }
 
     await Order.findByIdAndUpdate(id, { orderStatus });
+
+    // Notify the specific customer in room user_{userId} and persist in DB
+    const io = req.app.get("io");
+    const orderShortId = order._id.toString().slice(-6).toUpperCase();
+
+    await sendNotification(io, {
+      recipientId: order.userId,
+      recipientRole: "user",
+      title: "Order Status Updated",
+      message: `Your order #${orderShortId} is now "${orderStatus}".`,
+      orderId: order._id,
+      eventName: "orderStatusUpdated",
+      data: {
+        orderId: order._id,
+        orderStatus,
+      },
+    });
 
     res.status(200).json({
       success: true,

@@ -13,17 +13,18 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { logoutUser, resetTokenAndCredentials } from "@/store/auth-slice";
+import { resetTokenAndCredentials } from "@/store/auth-slice";
 import UserCartWrapper from "./cart-wrapper";
 import { useEffect, useState } from "react";
 import { fetchCartItems } from "@/store/shop/cart-slice";
 import { Label } from "../ui/label";
 import { toast } from "sonner";
+import NotificationBell from "../common/notification-bell";
 
 function MenuItems({ setOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
 
   function handleNavigate(getCurrentMenuItem) {
     sessionStorage.removeItem("filters");
@@ -85,6 +86,9 @@ function HeaderRightContent({ setOpen }) {
 
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
+      {/* NOTIFICATION BELL */}
+      <NotificationBell />
+
       {/* CART BUTTON */}
       <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
         <SheetTrigger asChild>

@@ -77,6 +77,18 @@ const shoppingOrderSlice = createSlice({
     resetOrderDetails: (state) => {
       state.orderDetails = null;
     },
+    updateCustomerOrderStatus: (state, action) => {
+      const { orderId, orderStatus } = action.payload;
+
+      const orderIndex = state.orderList.findIndex((o) => o._id === orderId);
+      if (orderIndex !== -1) {
+        state.orderList[orderIndex].orderStatus = orderStatus;
+      }
+
+      if (state.orderDetails && state.orderDetails._id === orderId) {
+        state.orderDetails.orderStatus = orderStatus;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -123,6 +135,6 @@ const shoppingOrderSlice = createSlice({
   },
 });
 
-export const { resetOrderDetails, setOrderDetails } = shoppingOrderSlice.actions;
+export const { resetOrderDetails, setOrderDetails, updateCustomerOrderStatus } = shoppingOrderSlice.actions;
 
 export default shoppingOrderSlice.reducer;

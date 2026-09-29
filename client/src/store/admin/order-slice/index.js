@@ -56,6 +56,12 @@ const adminOrderSlice = createSlice({
     resetOrderDetails: (state) => {
       state.orderDetails = null;
     },
+    addNewOrder: (state, action) => {
+      const exists = state.orderList.some((o) => o._id === action.payload._id);
+      if (!exists) {
+        state.orderList.unshift(action.payload);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -84,6 +90,6 @@ const adminOrderSlice = createSlice({
   },
 });
 
-export const { resetOrderDetails, setOrderDetails } = adminOrderSlice.actions;
+export const { resetOrderDetails, setOrderDetails, addNewOrder } = adminOrderSlice.actions;
 
 export default adminOrderSlice.reducer;

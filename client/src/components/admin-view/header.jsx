@@ -1,18 +1,18 @@
 import { AlignJustify, LogOut } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch } from "react-redux";
-import { logoutUser, resetTokenAndCredentials } from "@/store/auth-slice";
+import { resetTokenAndCredentials } from "@/store/auth-slice";
 import { useNavigate } from "react-router-dom";
+import NotificationBell from "../common/notification-bell";
 
 function AdminHeader({ setOpen }) {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   function handleLogout() {
-    // dispatch(logoutUser());
-    dispatch(resetTokenAndCredentials())
-    sessionStorage.clear()
-    navigate('/auth/login')
+    dispatch(resetTokenAndCredentials());
+    sessionStorage.clear();
+    navigate('/auth/login');
   }
 
   return (
@@ -21,12 +21,13 @@ function AdminHeader({ setOpen }) {
         <AlignJustify />
         <span className="sr-only">Toggle Menu</span>
       </Button>
-      <div className="flex flex-1 justify-end">
+      <div className="flex flex-1 justify-end items-center gap-3">
+        <NotificationBell />
         <Button
           onClick={handleLogout}
           className="inline-flex gap-2 items-center rounded-md px-4 py-2 text-sm font-medium shadow"
         >
-          <LogOut />
+          <LogOut className="w-4 h-4" />
           Logout
         </Button>
       </div>

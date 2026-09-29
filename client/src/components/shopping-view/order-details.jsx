@@ -9,17 +9,36 @@ import {
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
+import { Clock, CheckCircle2, Truck, PackageCheck, AlertCircle } from "lucide-react";
+
+const ORDER_STEPS = [
+  { id: "pending", label: "Placed", icon: Clock },
+  { id: "confirmed", label: "Confirmed", icon: CheckCircle2 },
+  { id: "inShipping", label: "Shipping", icon: Truck },
+  { id: "delivered", label: "Delivered", icon: PackageCheck },
+];
+
+function getActiveStepIndex(status) {
+  const s = status?.toLowerCase();
+  if (s === "delivered") return 3;
+  if (s === "inshipping") return 2;
+  if (s === "confirmed" || s === "inprocess") return 1;
+  return 0;
+}
 
 function ShoppingOrderDetailsView({ orderDetails, selectedOrderId, isDetailsLoading }) {
   const { user } = useSelector((state) => state.auth);
 
+  const isRejected = orderDetails?.orderStatus?.toLowerCase() === "rejected";
+  const currentStepIndex = getActiveStepIndex(orderDetails?.orderStatus);
+
   return (
-    <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
+    <DialogContent className="sm:max-w-[620px] max-h-[85vh] overflow-y-auto">
       {/* Dialog Header: accessible title and description for modal */}
       <DialogHeader>
         <DialogTitle>Order #{orderDetails?._id || selectedOrderId}</DialogTitle>
         <DialogDescription>
-          Order summary, purchased items, and delivery address.
+          Live order tracking, purchased items, and delivery status.
         </DialogDescription>
       </DialogHeader>
 
@@ -33,6 +52,71 @@ function ShoppingOrderDetailsView({ orderDetails, selectedOrderId, isDetailsLoad
         </div>
       ) : (
         <div className="grid gap-6">
+          {/* Animated Real-Time Status Stepper */}
+          {isRejected ? (
+            <div className="flex items-center gap-3 p-3.5 rounded-lg bg-red-50 border border-red-200 text-red-700">
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">Order Cancelled / Rejected</p>
+                <p className="text-xs text-red-600">
+                  This order was not approved or was cancelled. Contact support for help.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-slate-50 border rounded-xl p-4">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                Live Order Progress
+              </p>
+              <div className="flex items-center justify-between relative">
+                {ORDER_STEPS.map((step, index) => {
+                  const Icon = step.icon;
+                  const isCompleted = currentStepIndex >= index;
+                  const isCurrent = currentStepIndex === index;
+
+                  return (
+                    <div key={step.id} className="flex-1 flex flex-col items-center relative z-10">
+                      {/* Connecting Line between steps */}
+                      {index > 0 && (
+                        <div
+                          className={`absolute top-4 -left-1/2 w-full h-1 -z-10 transition-colors duration-500 ${
+                            currentStepIndex >= index ? "bg-green-500" : "bg-slate-200"
+                          }`}
+                        />
+                      )}
+
+                      {/* Step Circle Icon */}
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          isCompleted
+                            ? "bg-green-500 text-white shadow-md shadow-green-200 scale-105"
+                            : isCurrent
+                            ? "bg-primary text-primary-foreground ring-4 ring-primary/20 scale-110"
+                            : "bg-white border-2 border-slate-300 text-slate-400"
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                      </div>
+
+                      {/* Step Label */}
+                      <span
+                        className={`text-xs mt-2 font-medium transition-colors ${
+                          isCompleted
+                            ? "text-green-700 font-semibold"
+                            : isCurrent
+                            ? "text-primary font-bold"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        {step.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="grid gap-2">
             <div className="flex mt-2 items-center justify-between">
               <p className="font-medium">Order ID</p>
