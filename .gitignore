@@ -1,0 +1,5 @@
+# Local PDFs and generators (ignored from git)
+*.pdf
+generate_*.py
+test_*.pdf
+__pycache__/
