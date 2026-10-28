@@ -36,7 +36,15 @@ function ShoppingOrderDetailsView({ orderDetails, selectedOrderId, isDetailsLoad
     <DialogContent className="sm:max-w-[620px] max-h-[85vh] overflow-y-auto">
       {/* Dialog Header: accessible title and description for modal */}
       <DialogHeader>
-        <DialogTitle>Order #{orderDetails?._id || selectedOrderId}</DialogTitle>
+        <DialogTitle className="text-xl font-bold">
+          {orderDetails?.cartItems && orderDetails.cartItems.length > 0
+            ? orderDetails.cartItems.length === 1
+              ? orderDetails.cartItems[0].title
+              : `${orderDetails.cartItems[0].title} (+${orderDetails.cartItems.length - 1} more ${
+                  orderDetails.cartItems.length - 1 === 1 ? "item" : "items"
+                })`
+            : "Order Details"}
+        </DialogTitle>
         <DialogDescription>
           Live order tracking, purchased items, and delivery status.
         </DialogDescription>

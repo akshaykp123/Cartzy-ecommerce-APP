@@ -78,15 +78,21 @@ const shoppingOrderSlice = createSlice({
       state.orderDetails = null;
     },
     updateCustomerOrderStatus: (state, action) => {
-      const { orderId, orderStatus } = action.payload;
+      const { orderId, orderStatus, paymentStatus } = action.payload;
 
       const orderIndex = state.orderList.findIndex((o) => o._id === orderId);
       if (orderIndex !== -1) {
         state.orderList[orderIndex].orderStatus = orderStatus;
+        if (paymentStatus) {
+          state.orderList[orderIndex].paymentStatus = paymentStatus;
+        }
       }
 
       if (state.orderDetails && state.orderDetails._id === orderId) {
         state.orderDetails.orderStatus = orderStatus;
+        if (paymentStatus) {
+          state.orderDetails.paymentStatus = paymentStatus;
+        }
       }
     },
   },

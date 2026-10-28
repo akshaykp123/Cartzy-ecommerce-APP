@@ -50,7 +50,15 @@ function AdminOrderDetailsView({ orderDetails, selectedOrderId, isDetailsLoading
     <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
       {/* Dialog Header: provides accessible title and description for Radix UI modal */}
       <DialogHeader>
-        <DialogTitle>Order #{orderDetails?._id || selectedOrderId}</DialogTitle>
+        <DialogTitle className="text-xl font-bold">
+          {orderDetails?.cartItems && orderDetails.cartItems.length > 0
+            ? orderDetails.cartItems.length === 1
+              ? orderDetails.cartItems[0].title
+              : `${orderDetails.cartItems[0].title} (+${orderDetails.cartItems.length - 1} more ${
+                  orderDetails.cartItems.length - 1 === 1 ? "item" : "items"
+                })`
+            : "Order Details"}
+        </DialogTitle>
         <DialogDescription>
           Order details including customer address, purchased items, and status controls.
         </DialogDescription>

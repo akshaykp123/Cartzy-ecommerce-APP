@@ -35,6 +35,7 @@ function ShoppingLayout() {
           updateCustomerOrderStatus({
             orderId: data.orderId,
             orderStatus: data.orderStatus,
+            paymentStatus: data.paymentStatus,
           })
         );
       }

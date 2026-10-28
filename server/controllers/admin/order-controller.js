@@ -90,6 +90,7 @@ const updateOrderStatus = async (req, res) => {
       data: {
         orderId: order._id,
         orderStatus,
+        paymentStatus: updateFields.paymentStatus || order.paymentStatus,
       },
     });
 
