@@ -134,11 +134,11 @@ function ShoppingOrderDetailsView({ orderDetails, selectedOrderId, isDetailsLoad
             </div>
             <div className="flex mt-2 items-center justify-between">
               <p className="font-medium">Payment method</p>
-              <Label>{orderDetails?.paymentMethod}</Label>
+              <Label>{orderDetails?.paymentMethod === "cod" ? "Cash on Delivery (COD)" : orderDetails?.paymentMethod}</Label>
             </div>
             <div className="flex mt-2 items-center justify-between">
               <p className="font-medium">Payment Status</p>
-              <Label>{orderDetails?.paymentStatus}</Label>
+              <Label className="capitalize">{orderDetails?.paymentMethod === "cod" && orderDetails?.paymentStatus === "unpaid" ? "Unpaid (Pay on Delivery)" : orderDetails?.paymentStatus}</Label>
             </div>
             <div className="flex mt-2 items-center justify-between">
               <p className="font-medium">Order Status</p>

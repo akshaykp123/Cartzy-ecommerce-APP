@@ -69,7 +69,12 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    await Order.findByIdAndUpdate(id, { orderStatus });
+    const updateFields = { orderStatus };
+    if (orderStatus === "delivered" && order.paymentMethod === "cod") {
+      updateFields.paymentStatus = "paid";
+    }
+
+    await Order.findByIdAndUpdate(id, updateFields);
 
     // Notify the specific customer in room user_{userId} and persist in DB
     const io = req.app.get("io");

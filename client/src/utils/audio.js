@@ -1,6 +1,6 @@
-/**
- * Plays a pleasant synthetic two-tone chime using browser Web Audio API.
- * Does not require external audio files or MP3 assets.
+/*
+ Plays a pleasant synthetic two-tone chime using browser Web Audio API.
+  Does not require external audio files or MP3 assets.
  */
 export const playNotificationChime = () => {
   try {
@@ -9,7 +9,7 @@ export const playNotificationChime = () => {
 
     const ctx = new AudioContextClass();
 
-    // Primary tone (E5 ~ 659.25 Hz) transitioning to (G5 ~ 783.99 Hz)
+    // Primary tone
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -26,7 +26,7 @@ export const playNotificationChime = () => {
     osc.start();
     osc.stop(ctx.currentTime + 0.4);
   } catch (err) {
-    // Browsers block audio before first user interaction; ignore silently
+    // Browsers block audio before first user interaction, ignore silently
     console.debug("[Audio] Chime playback prevented by browser autoplay policy:", err);
   }
 };

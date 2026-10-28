@@ -21,6 +21,53 @@ const createOrder = async (req, res) => {
       cartId,
     } = req.body;
 
+    // Handle Cash on Delivery (COD) orders directly without third-party redirection
+    if (paymentMethod === "cod") {
+      const newlyCreatedOrder = new Order({
+        userId,
+        cartId,
+        cartItems,
+        addressInfo,
+        orderStatus: "confirmed",
+        paymentMethod: "cod",
+        paymentStatus: "unpaid",
+        totalAmount,
+        orderDate: orderDate || new Date(),
+        orderUpdateDate: orderUpdateDate || new Date(),
+        paymentId: "COD",
+        payerId: "",
+      });
+
+      await newlyCreatedOrder.save();
+
+      // Deduct inventory stock for each ordered product
+      for (let item of cartItems) {
+        let product = await Product.findById(item.productId);
+        if (product) {
+          product.totalStock = Math.max(0, product.totalStock - item.quantity);
+          await product.save();
+        }
+      }
+
+      // Clear the user's cart in database
+      if (cartId) {
+        await Cart.findByIdAndDelete(cartId);
+      }
+
+      // Real-time broadcast to admin if socket.io is running
+      const io = req.app.get("io");
+      if (io) {
+        io.to("admin-room").emit("newOrderPlaced", newlyCreatedOrder);
+      }
+
+      return res.status(201).json({
+        success: true,
+        isCod: true,
+        orderId: newlyCreatedOrder._id,
+        message: "Order placed successfully via Cash on Delivery",
+      });
+    }
+
     const create_payment_json = {
       intent: "sale",
       payer: {

@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { createNewOrder } from "@/store/shop/order-slice";
 import { toast } from "sonner";
+import { clearCart } from "@/store/shop/cart-slice";
+import { useNavigate } from "react-router-dom";
+import { CreditCard, Banknote } from "lucide-react";
 
 
 
@@ -15,6 +18,8 @@ function ShoppingCheckout() {
     const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
     const dispatch = useDispatch();
     const [isPaymentStart, setIsPaymemntStart] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState("paypal");
+    const navigate = useNavigate();
     const { approvalURL } = useSelector((state) => state.shopOrder);
     
      const totalCartAmount =
@@ -32,7 +37,7 @@ function ShoppingCheckout() {
       
       
 
-    function handleInitiatePaypalPayment() {
+    function handleInitiatePayment() {
         if (!cartItems || !cartItems.items || cartItems.items.length === 0) {
   toast.warning("Your cart is empty. Please add items to proceed");
   return;
@@ -43,6 +48,8 @@ function ShoppingCheckout() {
             toast.warning("Please select one address to proceed")
             return ;
         }
+
+        const isCod = paymentMethod === "cod";
 
         const orderData = {
             userId: user?.id,
@@ -65,20 +72,27 @@ function ShoppingCheckout() {
                 phone: currentSelectedAddress?.phone,
                 notes: currentSelectedAddress?.notes,
             },
-            orderStatus: "pending",
-            paymentMethod: "paypal",
-            paymentStatus: "pending",
+            orderStatus: isCod ? "confirmed" : "pending",
+            paymentMethod: paymentMethod,
+            paymentStatus: isCod ? "unpaid" : "pending",
             totalAmount: totalCartAmount,
             orderDate: new Date(),
             orderUpdateDate: new Date(),
-            paymentId: "",
+            paymentId: isCod ? "COD" : "",
             payerId: "",
             };
 
          dispatch(createNewOrder(orderData)).then((data) => {
             console.log(data, "payment");
             if (data?.payload?.success) {
-                setIsPaymemntStart(true);
+                if (isCod) {
+                    dispatch(clearCart());
+                    toast.success("Order placed successfully via Cash on Delivery!");
+                    setIsPaymemntStart(false);
+                    navigate("/shop/payment-success");
+                } else {
+                    setIsPaymemntStart(true);
+                }
             } else {
                 setIsPaymemntStart(false);
             }
@@ -110,10 +124,51 @@ function ShoppingCheckout() {
                     <span className="font-bold">${totalCartAmount}</span>
                     </div>
                 </div>
+                <div className="mt-4 space-y-2">
+                    <p className="font-semibold text-sm text-gray-700">Select Payment Method</p>
+                    <div className="grid grid-cols-2 gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setPaymentMethod("paypal")}
+                            className={`p-3 border rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+                                paymentMethod === "paypal"
+                                    ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm"
+                                    : "border-gray-200 hover:border-gray-300"
+                            }`}
+                        >
+                            <div className="flex items-center gap-1.5 font-semibold text-sm">
+                                <CreditCard className="w-4 h-4 text-blue-600" />
+                                <span>PayPal</span>
+                            </div>
+                            <span className="text-[11px] text-muted-foreground">Pay online</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setPaymentMethod("cod")}
+                            className={`p-3 border rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+                                paymentMethod === "cod"
+                                    ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm"
+                                    : "border-gray-200 hover:border-gray-300"
+                            }`}
+                        >
+                            <div className="flex items-center gap-1.5 font-semibold text-sm">
+                                <Banknote className="w-4 h-4 text-emerald-600" />
+                                <span>Cash on Delivery</span>
+                            </div>
+                            <span className="text-[11px] text-muted-foreground">Pay at doorstep</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div className="mt-4 w-full">
-                    <Button  onClick={handleInitiatePaypalPayment} className="w-full">
+                    <Button onClick={handleInitiatePayment} disabled={isPaymentStart} className="w-full">
                        {isPaymentStart
-                        ? "Processing Paypal Payment..."
+                        ? paymentMethod === "cod"
+                            ? "Placing Order..."
+                            : "Processing Paypal Payment..."
+                        : paymentMethod === "cod"
+                        ? "Place Order (Cash on Delivery)"
                         : "Checkout with Paypal"}
                     </Button>
                 </div>
